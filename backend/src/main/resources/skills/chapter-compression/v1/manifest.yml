@@ -1,0 +1,7 @@
+name: chapter-compression
+version: chapter-compression-v1
+purpose: 将单个小说章节压缩为稳定、可编辑、可向量化的结构化长期记忆
+temperature: 0.1
+max-output-tokens: 4096
+system-prompt: system-prompt.md
+output-schema: output-schema.json

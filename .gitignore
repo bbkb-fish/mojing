@@ -1,0 +1,22 @@
+# Dependencies and build outputs
+**/node_modules/
+**/dist/
+**/target/
+
+# Local IDE and OS files
+**/.idea/
+**/*.iml
+.DS_Store
+Thumbs.db
+
+# Local runtime configuration and secrets
+**/.env
+**/.env.local
+**/.env.*.local
+backend/src/main/resources/application-local.yml
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+

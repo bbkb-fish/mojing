@@ -1,0 +1,32 @@
+# Copy this file to application-local.yml for local development.
+# Never commit real passwords or API keys.
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:mysql://127.0.0.1:3306/bbkb_novel?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:change-me}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: Asia/Shanghai
+
+mojing:
+  ai:
+    api-key: ${AI_API_KEY:}
+    base-url: ${AI_BASE_URL:https://api.deepseek.com}
+    model: ${AI_MODEL:deepseek-flash}
+  embedding:
+    api-key: ${EMBEDDING_API_KEY:}
+    base-url: ${EMBEDDING_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode/v1}
+    model: ${EMBEDDING_MODEL:text-embedding-v4}
+    dimensions: ${EMBEDDING_DIMENSIONS:1024}
+  qdrant:
+    base-url: ${QDRANT_BASE_URL:http://127.0.0.1:6333}
+    api-key: ${QDRANT_API_KEY:}
+    collection: ${QDRANT_COLLECTION:novel_memory}
+    story-bible-collection: ${QDRANT_STORY_BIBLE_COLLECTION:novel_story_bible_chat}
+    vector-size: ${QDRANT_VECTOR_SIZE:1024}

@@ -1,0 +1,176 @@
+/* Writing workspace: quiet surfaces, generous manuscript space, compact controls. */
+.studio-shell {
+  --ink: #302e38;
+  --muted: #77737f;
+  --line: #e8e5e1;
+  --paper: #fffefa;
+  --accent: #7760b3;
+  height: 100dvh;
+  min-height: 0;
+  background: #f5f4f0;
+  -webkit-font-smoothing: antialiased;
+}
+.studio-shell button { transition: background .16s, border-color .16s, color .16s; }
+.studio-shell button:focus-visible,
+.writing-more-tools summary:focus-visible {
+  outline: 2px solid #9982c5;
+  outline-offset: 3px;
+}
+.studio-shell .topbar {
+  grid-template-columns: minmax(190px, 1fr) minmax(0, 1.3fr) minmax(190px, 1fr);
+  background: #fcfbf8;
+  box-shadow: none;
+}
+.studio-shell .brand { padding-left: 18px; gap: 10px; }
+.studio-shell .brand-mark { background: #7b65ad; box-shadow: none; border-radius: 10px; }
+.studio-shell .brand-name { font-size: 16px; letter-spacing: 3px; }
+.studio-shell .brand-tagline { color: #96909d; font-size: 10px; }
+.studio-shell .book-title { min-width: 0; max-width: 100%; font-size: 13px; }
+.studio-shell .book-title > span:nth-child(2) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.studio-shell .book-title .status-dot,
+.studio-shell .book-title .saved { display: none; }
+.studio-shell .avatar-button { background: #ede9e3; color: #696273; }
+.studio-shell .workspace { height: calc(100dvh - 64px); min-height: 0; }
+.studio-shell .navigator { background: #f9f8f5; border-right: 0; min-width: 0; }
+.studio-shell .novel-card { margin: 18px 12px 16px; padding: 10px 4px; border: 0; background: transparent; gap: 10px; }
+.studio-shell .cover-mini { background: #464b48; box-shadow: none; border-radius: 3px 7px 7px 3px; }
+.studio-shell .novel-meta { min-width: 0; }
+.studio-shell .novel-meta strong { font-size: 13px; }
+.studio-shell .novel-meta span { color: #928d94; font-size: 10px; }
+.studio-shell .story-bible-button {
+  flex-shrink: 0;
+  min-height: 51px;
+  margin: 0 10px 4px;
+  padding: 9px 12px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: #5f5969;
+  background: transparent;
+  box-shadow: none;
+}
+.studio-shell .story-bible-button > span { color: #88759f; }
+.studio-shell .story-bible-button strong { font-size: 12px; font-weight: 550; }
+.studio-shell .story-bible-button small { color: #948d99; font-size: 10px; }
+.studio-shell .story-bible-button:hover { background: #efecf3; border-color: #e5deed; }
+.writing-more-tools { flex-shrink: 0; margin: 3px 16px 14px; color: #8a8390; font-size: 11px; }
+.writing-more-tools summary { list-style: none; padding: 8px 7px; cursor: pointer; display: flex; justify-content: space-between; }
+.writing-more-tools summary::-webkit-details-marker { display: none; }
+.writing-more-tools[open] summary span { transform: rotate(180deg); }
+.writing-more-tools button { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 10px 8px; border: 0; border-radius: 6px; background: transparent; text-align: left; cursor: pointer; }
+.writing-more-tools button:hover { background: #efecf3; }
+.writing-more-tools small { font-size: 10px; color: #97909d; }
+.studio-shell .chapter-panel { min-height: 70px; padding: 0 10px 12px; scrollbar-width: thin; }
+.studio-shell .section-label { padding: 10px 8px; border-top: 1px solid var(--line); color: #8b8492; }
+.studio-shell .add-chapter-button { padding: 5px 7px; background: transparent; color: #7760a4; font-size: 11px; }
+.studio-shell .chapter-item { position: relative; min-height: 58px; margin-bottom: 3px; padding: 10px; border-radius: 8px; gap: 9px; }
+.studio-shell .chapter-item:hover { background: #efede9; }
+.studio-shell .chapter-item.active { background: #ece7f3; }
+.studio-shell .chapter-item.active::before { content: ''; position: absolute; left: 0; top: 17px; bottom: 17px; width: 3px; border-radius: 3px; background: #8d73b6; }
+.studio-shell .chapter-index { color: #aca4b2; font-size: 10px; font-variant-numeric: tabular-nums; }
+.studio-shell .chapter-copy { min-width: 0; }
+.studio-shell .chapter-copy strong { font-size: 12px; font-weight: 500; color: #625b6b; }
+.studio-shell .chapter-item.active .chapter-copy strong { color: #654d8c; font-weight: 650; }
+.studio-shell .chapter-copy small { color: #98909e; font-size: 10px; margin-top: 5px; }
+.studio-shell .chapter-active-dot { background: #967cbf; }
+.studio-shell .delete-chapter-button:focus-visible { opacity: 1; }
+.studio-shell .nav-footer { padding: 16px 18px; background: transparent; }
+.studio-shell .word-goal { font-size: 11px; color: #8a8390; }
+.studio-shell .word-goal strong { font-size: 13px; font-weight: 550; color: #655c70; font-variant-numeric: tabular-nums; }
+.writing-footer-note { margin-top: 9px; font-size: 10px; color: #a49ba9; letter-spacing: .5px; }
+.studio-shell .pane-resizer { background: #f0eee9; }
+.studio-shell .pane-resizer::after { height: 28px; background: #c6bfcf; opacity: 0; }
+.studio-shell .pane-resizer:hover::after { opacity: 1; }
+.studio-shell .editor-section { background: #f2f0eb; min-height: 0; container-type: inline-size; }
+.studio-shell .editor-toolbar { height: auto; min-height: 54px; padding: 10px 14px; gap: 7px; flex-wrap: wrap; background: #faf9f6; border-color: var(--line); }
+.studio-shell .editor-toolbar > * { flex-shrink: 0; }
+.studio-shell .panel-toggle { height: 30px; padding: 0 8px; margin: 0; border-color: transparent; background: transparent; border-radius: 6px; font-size: 11px; white-space: nowrap; }
+.studio-shell .panel-toggle:hover,
+.studio-shell .panel-toggle.active { background: #eeE9f4; border-color: transparent; color: #705592; }
+.studio-shell .format-actions { gap: 0; }
+.studio-shell .format-actions button { height: 29px; width: 29px; }
+.studio-shell .font-size-control { padding-left: 9px; margin: 0; gap: 6px; font-size: 11px; border-color: #e3dedf; }
+.studio-shell .font-size-control select { height: 29px; padding: 0 4px 0 7px; background: transparent; border-color: #e5e0e5; font-size: 11px; }
+.studio-shell .inline-completion-toggle { margin-left: auto; }
+.studio-shell .paper { flex: 1; min-height: 0; height: auto; width: min(800px, calc(100% - 40px)); margin: 20px auto 0; padding: 44px 44px 70px; border: 1px solid #e9e4db; border-bottom: 0; border-radius: 8px 8px 0 0; background: var(--paper); box-shadow: 0 3px 16px #4d403006; scrollbar-color: #d1cbd2 transparent; }
+.studio-shell .paper::-webkit-scrollbar { width: 6px; }
+.studio-shell .paper::-webkit-scrollbar-track { background: transparent; }
+.studio-shell .paper::-webkit-scrollbar-thumb { background: #d1cbd2; border: 1px solid var(--paper); }
+.studio-shell .chapter-kicker { color: #a29385; font: 10px/1.6 Georgia, serif; letter-spacing: 3px; }
+.studio-shell .chapter-title-input { margin: 14px 0 18px; color: #39333b; font-size: 28px; line-height: 1.6; }
+.studio-shell .chapter-divider { margin-bottom: 32px; opacity: .48; }
+.studio-shell .manuscript,
+.studio-shell .inline-completion-ghost { line-height: 2; letter-spacing: .4px; }
+.studio-shell .manuscript { color: #443e3b; }
+.studio-shell .manuscript::placeholder { color: #b0a59b; }
+.editor-statusbar { display: flex; align-items: center; justify-content: space-between; flex: 0 0 34px; padding: 0 18px; gap: 12px; border-top: 1px solid #e6e1d9; color: #968b93; background: #f9f7f2; font-size: 10px; }
+.editor-statusbar > div { display: flex; gap: 15px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.editor-save-status { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.editor-save-status i { width: 5px; height: 5px; border-radius: 50%; background: #88a18c; }
+.editor-save-status.is-error { color: #b05050; }
+.editor-save-status.is-error i { background: #b05050; }
+.editor-save-status.is-pending i { background: #bb9656; }
+.studio-shell .ai-panel { min-width: 0; border-left: 0; background: #fcfbf8; }
+.studio-shell .ai-header { height: 58px; justify-content: space-between; padding: 0 18px; border-bottom: 0; }
+.studio-shell .ai-header strong { font-size: 13px; font-weight: 650; }
+.studio-shell .sparkle { display: grid; place-items: center; width: 27px; height: 27px; border-radius: 8px; background: #eee8f5; color: #8664b1; }
+.assistant-caption { color: #a098a7; font-size: 10px; }
+.studio-shell .agent-tabs { display: flex; flex-wrap: wrap; gap: 5px; padding: 0 14px 14px; background: transparent; border-bottom: 1px solid var(--line); }
+.studio-shell .agent-tabs button { flex: 1 0 28%; height: 32px; padding: 0 8px; font-size: 11px; border: 1px solid #ebe6ed; border-radius: 7px; color: #85798c; background: #fffdfa; white-space: nowrap; }
+.studio-shell .agent-tabs button:hover { background: #f1edf5; }
+.studio-shell .agent-tabs button.active { color: #715196; background: #eee7f5; border-color: #dfd2ec; font-weight: 600; }
+.studio-shell .ai-scroll { min-height: 0; padding: 18px 15px 24px; scrollbar-width: thin; scrollbar-color: #d7cfdc transparent; }
+.studio-shell .director-launcher { min-height: 310px; padding: 25px 18px; background: #f8f5fb; border-color: #e7dfee; border-radius: 12px; }
+.studio-shell .director-launcher-icon { width: 46px; height: 46px; border-radius: 13px; background: #e9e0f2; color: #8763ad; box-shadow: none; font-size: 24px; }
+.studio-shell .director-launcher small { font-size: 10px; font-weight: 500; color: #9a86aa; }
+.studio-shell .director-launcher h2 { margin: 9px 0 12px; font-size: 19px; font-weight: 600; }
+.studio-shell .director-launcher > p { font-size: 12px; line-height: 1.9; color: #92849c; }
+.studio-shell .director-launcher > div { background: #fffcff; border: 1px solid #ece5f1; }
+.studio-shell .director-launcher > button,
+.studio-shell .generate-button { background: #8064a6; box-shadow: none; border-radius: 8px; min-height: 40px; font-size: 12px; }
+.studio-shell .director-launcher > button:hover,
+.studio-shell .generate-button:hover:not(:disabled) { background: #705492; }
+.studio-shell .generate-button:disabled { opacity: .55; cursor: not-allowed; }
+.studio-shell .mode-intro { background: #f2edf7; border: 1px solid #e9e0ef; border-radius: 10px; padding: 13px; }
+.studio-shell .mode-intro strong { font-size: 12px; }
+.studio-shell .mode-intro p { line-height: 1.8; color: #8e8098; }
+.studio-shell .mode-icon { box-shadow: none; background: #fcfaff; }
+.studio-shell .prompt-box { border-color: #e3dce8; border-radius: 9px; background: #fffefd; }
+.studio-shell .prompt-box textarea { font-size: 12px; line-height: 1.9; padding: 13px; }
+.studio-shell .prompt-box:focus-within { border-color: #b39acb; box-shadow: 0 0 0 3px #8064a60a; }
+.studio-shell .result-card,
+.studio-shell .inspiration-card { border-color: #e4dce9; background: #fffefd; border-radius: 10px; box-shadow: none; }
+.studio-shell .result-card > p { line-height: 1.9; font-size: 13px; }
+.studio-shell .organize-note { background: #f2efeb; }
+.studio-shell.focus-mode .topbar { grid-template-columns: minmax(0, 1fr) auto; }
+.studio-shell.focus-mode .paper { width: min(850px, calc(100% - 48px)); padding-inline: 70px; }
+@container (max-width: 580px) {
+  .studio-shell .font-size-control > span { display: none; }
+  .studio-shell .paper { padding-inline: 28px; width: calc(100% - 28px); }
+  .studio-shell .editor-toolbar { padding-inline: 10px; gap: 4px; }
+}
+@media (max-height: 740px) and (min-width: 901px) {
+  .studio-shell .novel-card { margin-block: 9px; }
+  .studio-shell .story-bible-button { min-height: 43px; padding-block: 6px; }
+  .writing-more-tools { margin-bottom: 5px; }
+}
+@media (max-width: 900px) {
+  .studio-shell .topbar { grid-template-columns: 1fr auto; }
+  .studio-shell .navigator, .studio-shell .ai-panel { padding-top: env(safe-area-inset-top); }
+  .studio-shell .editor-toolbar { min-height: 50px; }
+  .studio-shell .font-size-control > span { display: inline; }
+  .studio-shell .paper { width: min(760px, calc(100% - 28px)); margin-top: 14px; }
+  .studio-shell .mobile-ai { font-size: 11px; background: #8064a6; }
+  .studio-shell.focus-mode .paper { padding-inline: 28px; }
+}
+@media (max-width: 560px) {
+  .studio-shell .topbar { height: 56px; }
+  .studio-shell .workspace { height: calc(100dvh - 56px); }
+  .studio-shell .brand { gap: 7px; padding-left: 10px; }
+  .studio-shell .paper { padding: 30px 22px 50px; width: calc(100% - 18px); }
+  .studio-shell .chapter-title-input { font-size: 24px; }
+  .studio-shell .editor-statusbar { padding-inline: 12px; }
+  .studio-shell .editor-statusbar > div { gap: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .studio-shell button, .studio-shell .navigator, .studio-shell .ai-panel { transition: none; }
+}

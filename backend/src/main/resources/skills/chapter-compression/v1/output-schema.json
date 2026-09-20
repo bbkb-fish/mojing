@@ -1,0 +1,19 @@
+{
+  "type": "object",
+  "required": ["skillVersion", "summary", "timeInfo", "locations", "characters", "scenes", "importantFacts", "keyEvents", "foreshadowings", "unresolvedQuestions", "plotProgress", "importance", "identityReveals"],
+  "properties": {
+    "skillVersion": {"const": "chapter-compression-v1"},
+    "summary": {"type": "string"},
+    "timeInfo": {"type": "string"},
+    "locations": {"type": "array", "items": {"type": "string"}},
+    "characters": {"type": "array", "items": {"type": "object", "required": ["name", "role", "actions", "stateChange", "newKnowledge", "firstAppearance", "foreshadowings", "profileChanges"], "properties": {"name": {"type": "string"}, "role": {"type": "string"}, "actions": {"type": "string"}, "stateChange": {"type": "string"}, "newKnowledge": {"type": "string"}, "firstAppearance": {"type": "boolean"}, "foreshadowings": {"type": "array", "items": {"type": "string"}}, "profileChanges": {"type": "array", "items": {"type": "object", "required": ["field", "operation", "oldValue", "newValue", "evidence", "confidence", "applyToProfile"], "properties": {"field": {"enum": ["DESCRIPTION", "PERSONALITY", "GOAL", "AFFILIATIONS", "CURRENT_STATE", "RELATIONSHIPS"]}, "operation": {"enum": ["ADD", "REPLACE", "REMOVE"]}, "oldValue": {"type": "string"}, "newValue": {"type": "string"}, "evidence": {"type": "string"}, "confidence": {"enum": ["HIGH", "MEDIUM", "LOW"]}, "applyToProfile": {"type": "boolean"}}}}}}},
+    "scenes": {"type": "array", "items": {"type": "object", "required": ["sceneIndex", "title", "boundaryType", "continuityKey", "timeSpan", "locations", "characters", "goal", "conflict", "subEvents", "result"], "properties": {"sceneIndex": {"type": "integer", "minimum": 1}, "title": {"type": "string"}, "boundaryType": {"enum": ["HARD", "SOFT"]}, "continuityKey": {"type": "string"}, "timeSpan": {"type": "string"}, "locations": {"type": "array", "items": {"type": "string"}}, "characters": {"type": "array", "items": {"type": "string"}}, "goal": {"type": "string"}, "conflict": {"type": "string"}, "subEvents": {"type": "array", "items": {"type": "object", "required": ["time", "location", "event"], "properties": {"time": {"type": "string"}, "location": {"type": "string"}, "event": {"type": "string"}}}}, "result": {"type": "string"}}}},
+    "importantFacts": {"type": "array", "items": {"type": "object", "required": ["type", "content", "importance"], "properties": {"type": {"enum": ["FORESHADOWING", "UNRESOLVED_THREAD", "IMPORTANT_ITEM", "WORLD_RULE", "LOCATION_STATE", "RELATIONSHIP", "TIME_MARKER", "REVEAL", "OTHER"]}, "content": {"type": "string"}, "importance": {"enum": ["HIGH", "MEDIUM", "LOW"]}}}},
+    "keyEvents": {"type": "array", "maxItems": 0},
+    "foreshadowings": {"type": "array", "maxItems": 0},
+    "unresolvedQuestions": {"type": "array", "maxItems": 0},
+    "plotProgress": {"type": "string"},
+    "importance": {"enum": ["HIGH", "MEDIUM", "LOW"]},
+    "identityReveals": {"type": "array", "items": {"type": "object", "required": ["identityName", "realCharacterName", "evidence", "confidence", "applyMerge"], "properties": {"identityName": {"type": "string"}, "realCharacterName": {"type": "string"}, "evidence": {"type": "string"}, "confidence": {"enum": ["HIGH", "MEDIUM", "LOW"]}, "applyMerge": {"type": "boolean"}}}}
+  }
+}

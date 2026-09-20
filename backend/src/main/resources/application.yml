@@ -1,0 +1,44 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: mojing-novel-backend
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+  threads:
+    virtual:
+      enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+mojing:
+  security:
+    # 尚未接入登录系统时使用的本地用户。接入 Spring Security 后由 CurrentUserProvider 读取登录用户。
+    local-user-id: ${LOCAL_USER_ID:1}
+  ai:
+    api-key: ${AI_API_KEY:}
+    base-url: ${AI_BASE_URL:https://api.openai.com/v1}
+    model: ${AI_MODEL:gpt-4.1-mini}
+    timeout: ${AI_TIMEOUT:180s}
+    temperature: ${AI_TEMPERATURE:0.8}
+    draft-max-tokens: ${AI_DRAFT_MAX_TOKENS:16000}
+    # 默认强制直连，避免继承 IDE、JVM 或 Windows 系统代理。确需代理时设置为 true。
+    use-system-proxy: ${AI_USE_SYSTEM_PROXY:false}
+  embedding:
+    api-key: ${EMBEDDING_API_KEY:}
+    base-url: ${EMBEDDING_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode/v1}
+    model: ${EMBEDDING_MODEL:text-embedding-v4}
+    dimensions: ${EMBEDDING_DIMENSIONS:1024}
+    timeout: ${EMBEDDING_TIMEOUT:30s}
+  qdrant:
+    base-url: ${QDRANT_BASE_URL:http://127.0.0.1:6333}
+    api-key: ${QDRANT_API_KEY:}
+    collection: ${QDRANT_COLLECTION:novel_memory}
+    story-bible-collection: ${QDRANT_STORY_BIBLE_COLLECTION:novel_story_bible_chat}
+    vector-size: ${QDRANT_VECTOR_SIZE:1024}
+    timeout: ${QDRANT_TIMEOUT:10s}
