@@ -695,6 +695,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { readJsonResponse } from './api-response'
 
 interface NovelDto {
   id: number
@@ -1120,13 +1121,8 @@ async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
     ...init,
     headers,
   })
-  const text = await response.text()
-  const data = text ? JSON.parse(text) as T & { message?: string } : undefined
-  if (!response.ok) {
-    if (response.status === 401 && path !== '/api/auth/login') clearAuth()
-    throw new Error(data?.message || `请求失败（${response.status}）`)
-  }
-  return data as T
+  if (response.status === 401 && path !== '/api/auth/login') clearAuth()
+  return readJsonResponse<T>(response)
 }
 
 async function requestEventStream(path: string, init: RequestInit,
@@ -1140,10 +1136,8 @@ async function requestEventStream(path: string, init: RequestInit,
     headers,
   })
   if (!response.ok) {
-    const text = await response.text()
-    let message = ''
-    try { message = (JSON.parse(text) as { message?: string }).message ?? '' } catch { /* 非 JSON 错误体 */ }
-    throw new Error(message || text || `请求失败（${response.status}）`)
+    if (response.status === 401) clearAuth()
+    await readJsonResponse<unknown>(response)
   }
   if (!response.body) throw new Error('浏览器没有收到流式响应体')
   const reader = response.body.getReader()
@@ -3615,9 +3609,8 @@ async function generate() {
   ragDebug.value = undefined
   try {
     const lengthMap: Record<string, number> = { '简短': 80, '标准': 160, '详细': 260 }
-    const response = await fetch(`${apiBaseUrl}/api/ai/completion`, {
+    const data = await requestJson<CompletionDto>('/api/ai/completion', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         novelId: novelId.value,
         chapterId: chapters.value[activeChapter.value]?.id,
@@ -3627,8 +3620,6 @@ async function generate() {
         styleId: selectedWritingStyleId.value,
       }),
     })
-    const data = await response.json() as CompletionDto
-    if (!response.ok) throw new Error(data.message || 'AI续写失败')
     result.value = data.completion?.trim() ?? ''
     ragDebug.value = data.rag
     if (!result.value) throw new Error('AI没有返回续写内容')
