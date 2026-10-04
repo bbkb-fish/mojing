@@ -1,11 +1,38 @@
 <template>
-  <section v-if="currentView === 'home'" class="home-shell">
+  <section v-if="!authReady" class="auth-loading"><span class="brand-mark"><span>墨</span></span><p>正在确认登录状态…</p></section>
+  <section v-else-if="!authUser" class="login-shell">
+    <main class="login-card">
+      <div class="login-brand"><span class="brand-mark"><span>墨</span></span><div><strong>墨境</strong><small>AI 小说创作空间</small></div></div>
+      <div class="login-heading"><span>{{ authMode === 'login' ? 'WELCOME BACK' : 'START YOUR STORY' }}</span><h1>{{ authMode === 'login' ? '继续你的故事' : '创建创作账号' }}</h1><p>{{ authMode === 'login' ? '登录后进入个人创作空间。' : '注册后就能建立自己的小说书架。' }}</p></div>
+      <form v-if="authMode === 'login'" @submit.prevent="login">
+        <label><span>用户名</span><input v-model="loginForm.username" autocomplete="username" maxlength="50" autofocus /></label>
+        <label><span>密码</span><div class="password-input"><input v-model="loginForm.password" :type="showLoginPassword ? 'text' : 'password'" autocomplete="current-password" maxlength="100" @input="loginError = ''" /><button type="button" @click="showLoginPassword = !showLoginPassword">{{ showLoginPassword ? '隐藏' : '显示' }}</button></div></label>
+        <div class="login-options"><label><input v-model="rememberLogin" type="checkbox" /><span>在这台设备上保持登录</span></label></div>
+        <p v-if="loginError" class="login-error">{{ loginError }}</p>
+        <button type="submit" :disabled="loggingIn">{{ loggingIn ? '正在登录…' : '登录' }}</button>
+      </form>
+      <form v-else @submit.prevent="register">
+        <label><span>用户名</span><input v-model="registerForm.username" autocomplete="username" maxlength="50" placeholder="字母开头，至少 3 位" required /></label>
+        <label><span>昵称</span><input v-model="registerForm.nickname" autocomplete="nickname" maxlength="100" placeholder="你希望如何被称呼" required /></label>
+        <label><span>密码</span><input v-model="registerForm.password" type="password" autocomplete="new-password" minlength="8" maxlength="100" placeholder="至少 8 个字符" required /></label>
+        <label><span>确认密码</span><input v-model="registerForm.confirmPassword" type="password" autocomplete="new-password" minlength="8" maxlength="100" required /></label>
+        <div class="login-options"><label><input v-model="rememberLogin" type="checkbox" /><span>在这台设备上保持登录</span></label></div>
+        <p v-if="registerError" class="login-error">{{ registerError }}</p>
+        <button type="submit" :disabled="registering">{{ registering ? '正在创建账号…' : '注册并进入' }}</button>
+      </form>
+      <div class="auth-switch">{{ authMode === 'login' ? '还没有账号？' : '已有账号？' }}<button type="button" @click="switchAuthMode">{{ authMode === 'login' ? '立即注册' : '返回登录' }}</button></div>
+    </main>
+  </section>
+  <section v-else-if="currentView === 'home'" class="home-shell">
     <header class="home-header">
       <div class="brand home-brand">
         <span class="brand-mark"><span>墨</span></span>
         <div><div class="brand-name">墨境</div><div class="brand-tagline">AI 小说创作空间</div></div>
       </div>
-      <button class="avatar-button">林</button>
+      <el-dropdown trigger="click" placement="bottom-end" @command="handleAccountCommand">
+        <button class="avatar-button" title="账号菜单">{{ (authUser.nickname || authUser.username).slice(0, 1) }}</button>
+        <template #dropdown><el-dropdown-menu><el-dropdown-item disabled><span class="account-menu-user"><strong>{{ authUser.nickname }}</strong><small>@{{ authUser.username }}</small></span></el-dropdown-item><el-dropdown-item command="settings" divided>账号设置</el-dropdown-item><el-dropdown-item command="logout">退出登录</el-dropdown-item></el-dropdown-menu></template>
+      </el-dropdown>
     </header>
     <main class="home-main">
       <div class="home-heading">
@@ -16,6 +43,7 @@
         </div>
       </div>
       <div v-if="loadingWorkspace" class="home-loading"><el-icon class="is-loading"><Loading /></el-icon><span>正在整理书架…</span></div>
+      <div v-else-if="!novels.length" class="home-empty"><span>✦</span><h2>你的故事，从这里开始</h2><p>书架还是空的。创建第一部小说，把灵感写下来吧。</p><button @click="openCreateNovel">＋ 新建第一部小说</button></div>
       <div v-else class="novel-grid">
         <button v-for="novel in novels" :key="novel.id" class="novel-home-card" @click="openNovel(novel)">
           <span class="home-cover"><b>{{ novel.title.slice(0, 1) }}</b><i>MOJING</i></span>
@@ -654,6 +682,14 @@
     </div>
   </el-dialog>
 
+  <el-dialog v-model="showAccountSettings" title="账号设置" width="min(520px, calc(100vw - 28px))" class="account-settings-dialog" :close-on-click-modal="false">
+    <div class="account-settings">
+      <section><div><strong>个人信息</strong><p>用户名用于登录，昵称会显示在创作空间中。</p></div><label><span>用户名</span><input :value="authUser?.username" disabled /></label><label><span>昵称</span><input v-model="profileForm.nickname" maxlength="100" /></label><button :disabled="savingProfile" @click="saveProfile">{{ savingProfile ? '保存中…' : '保存昵称' }}</button></section>
+      <section><div><strong>修改密码</strong><p>新密码至少 8 个字符。修改成功后需要重新登录。</p></div><label><span>当前密码</span><input v-model="passwordForm.currentPassword" type="password" autocomplete="current-password" maxlength="100" /></label><label><span>新密码</span><input v-model="passwordForm.newPassword" type="password" autocomplete="new-password" maxlength="100" /></label><label><span>确认新密码</span><input v-model="passwordForm.confirmPassword" type="password" autocomplete="new-password" maxlength="100" /></label><button class="password-change-button" :disabled="changingPassword" @click="changePassword">{{ changingPassword ? '修改中…' : '修改密码' }}</button></section>
+      <section class="account-security-section"><div><strong>登录安全</strong><p>如果怀疑账号在其他设备登录，可以让所有已签发的登录凭证立即失效。</p></div><button class="revoke-sessions-button" :disabled="revokingSessions" @click="revokeAllSessions">{{ revokingSessions ? '正在退出…' : '退出所有设备' }}</button></section>
+    </div>
+  </el-dialog>
+
 </template>
 
 <script setup lang="ts">
@@ -691,6 +727,9 @@ interface ChapterView {
   contentVersion: number
   version: number
 }
+
+interface AuthUser { id: number; username: string; nickname: string; avatarUrl: string | null; lastLoginAt: string | null; createdAt: string }
+interface LoginResponse { accessToken: string; expiresIn: number; user: AuthUser }
 
 interface EditorSnapshot {
   content: string
@@ -758,6 +797,25 @@ interface WritingStyleAssistDto { name: string; description: string; rulesText: 
 interface WritingStyleForm { databaseId?: number; name: string; description: string; rulesText: string; forbiddenWords: string; version?: number }
 
 const currentView = ref<'home' | 'editor' | 'director' | 'storyBible' | 'projectPlanning'>('home')
+const accessTokenKey = 'mojing-access-token'
+const authToken = ref(window.localStorage.getItem(accessTokenKey) ?? window.sessionStorage.getItem(accessTokenKey) ?? '')
+const authUser = ref<AuthUser>()
+const authReady = ref(false)
+const loggingIn = ref(false)
+const registering = ref(false)
+const authMode = ref<'login' | 'register'>('login')
+const rememberLogin = ref(Boolean(window.localStorage.getItem(accessTokenKey)))
+const showLoginPassword = ref(false)
+const loginError = ref('')
+const loginForm = ref({ username: window.localStorage.getItem('mojing-last-username') ?? '', password: '' })
+const registerForm = ref({ username: '', nickname: '', password: '', confirmPassword: '' })
+const registerError = ref('')
+const showAccountSettings = ref(false)
+const savingProfile = ref(false)
+const changingPassword = ref(false)
+const revokingSessions = ref(false)
+const profileForm = ref({ nickname: '' })
+const passwordForm = ref({ currentPassword: '', newPassword: '', confirmPassword: '' })
 const storyBibleReturnView = ref<'editor' | 'director'>('editor')
 const novels = ref<NovelDto[]>([])
 const focusMode = ref(false)
@@ -916,7 +974,7 @@ const savingStoryPart = ref(false)
 const editorRef = ref<HTMLTextAreaElement>()
 const paperRef = ref<HTMLElement>()
 const directorDraftRef = ref<HTMLElement>()
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'http://127.0.0.1:8081'
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? ''
 const rewriteContextChars = 1500
 
 const chapters = ref<ChapterView[]>([])
@@ -1055,21 +1113,31 @@ let projectEditRevision = 0
 let projectSavingPromise: Promise<boolean> | undefined
 
 async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
+  const headers = new Headers(init?.headers)
+  headers.set('Content-Type', 'application/json')
+  if (authToken.value) headers.set('Authorization', `Bearer ${authToken.value}`)
   const response = await fetch(`${apiBaseUrl}${path}`, {
     ...init,
-    headers: { 'Content-Type': 'application/json', ...(init?.headers ?? {}) },
+    headers,
   })
   const text = await response.text()
   const data = text ? JSON.parse(text) as T & { message?: string } : undefined
-  if (!response.ok) throw new Error(data?.message || `请求失败（${response.status}）`)
+  if (!response.ok) {
+    if (response.status === 401 && path !== '/api/auth/login') clearAuth()
+    throw new Error(data?.message || `请求失败（${response.status}）`)
+  }
   return data as T
 }
 
 async function requestEventStream(path: string, init: RequestInit,
                                   onEvent: (event: string, data: unknown) => void): Promise<void> {
+  const headers = new Headers(init.headers)
+  headers.set('Content-Type', 'application/json')
+  headers.set('Accept', 'text/event-stream')
+  if (authToken.value) headers.set('Authorization', `Bearer ${authToken.value}`)
   const response = await fetch(`${apiBaseUrl}${path}`, {
     ...init,
-    headers: { 'Content-Type': 'application/json', Accept: 'text/event-stream', ...(init.headers ?? {}) },
+    headers,
   })
   if (!response.ok) {
     const text = await response.text()
@@ -1116,6 +1184,130 @@ async function requestEventStream(path: string, init: RequestInit,
   }
 }
 
+function clearAuth() {
+  authToken.value = ''
+  authUser.value = undefined
+  window.localStorage.removeItem(accessTokenKey)
+  window.sessionStorage.removeItem(accessTokenKey)
+}
+
+async function restoreAuth() {
+  if (!authToken.value) { authReady.value = true; return }
+  try { authUser.value = await requestJson<AuthUser>('/api/auth/me') }
+  catch { clearAuth() }
+  finally { authReady.value = true }
+}
+
+async function login() {
+  if (loggingIn.value) return
+  const username = loginForm.value.username.trim()
+  if (!username || !loginForm.value.password) { ElMessage.warning('请输入用户名和密码'); return }
+  loginError.value = ''
+  loggingIn.value = true
+  try {
+    const response = await requestJson<LoginResponse>('/api/auth/login', { method: 'POST', body: JSON.stringify({ username, password: loginForm.value.password }) })
+    acceptAuth(response)
+    loginForm.value.password = ''
+    await initializeWorkspace()
+    ElMessage.success(`欢迎回来，${response.user.nickname}`)
+  } catch (error) { loginError.value = error instanceof Error ? error.message : '登录失败' }
+  finally { loggingIn.value = false }
+}
+
+function acceptAuth(response: LoginResponse) {
+  authToken.value = response.accessToken
+  authUser.value = response.user
+  window.localStorage.setItem('mojing-last-username', response.user.username)
+  window.localStorage.removeItem(accessTokenKey)
+  window.sessionStorage.removeItem(accessTokenKey)
+  const tokenStorage = rememberLogin.value ? window.localStorage : window.sessionStorage
+  tokenStorage.setItem(accessTokenKey, response.accessToken)
+}
+
+function switchAuthMode() {
+  authMode.value = authMode.value === 'login' ? 'register' : 'login'
+  loginError.value = ''
+  registerError.value = ''
+  registerForm.value.password = ''
+  registerForm.value.confirmPassword = ''
+}
+
+async function register() {
+  if (registering.value) return
+  const username = registerForm.value.username.trim()
+  const nickname = registerForm.value.nickname.trim()
+  const { password, confirmPassword } = registerForm.value
+  if (!/^[A-Za-z][A-Za-z0-9_]{2,49}$/.test(username)) { registerError.value = '用户名需为3到50位，以字母开头，仅含字母、数字和下划线'; return }
+  if (!nickname) { registerError.value = '请输入昵称'; return }
+  if (password.length < 8) { registerError.value = '密码至少需要 8 个字符'; return }
+  if (password !== confirmPassword) { registerError.value = '两次输入的密码不一致'; return }
+  registerError.value = ''
+  registering.value = true
+  try {
+    const response = await requestJson<LoginResponse>('/api/auth/register', { method: 'POST', body: JSON.stringify({ username, nickname, password }) })
+    acceptAuth(response)
+    registerForm.value = { username: '', nickname: '', password: '', confirmPassword: '' }
+    await initializeWorkspace()
+    ElMessage.success(`欢迎加入墨境，${response.user.nickname}`)
+  } catch (error) { registerError.value = error instanceof Error ? error.message : '注册失败' }
+  finally { registering.value = false }
+}
+
+function logout() {
+  clearAuth()
+  currentView.value = 'home'
+  novels.value = []
+  chapters.value = []
+  showAccountSettings.value = false
+}
+
+function handleAccountCommand(command: string) {
+  if (command === 'logout') { logout(); return }
+  if (command === 'settings') {
+    profileForm.value.nickname = authUser.value?.nickname ?? ''
+    passwordForm.value = { currentPassword: '', newPassword: '', confirmPassword: '' }
+    showAccountSettings.value = true
+  }
+}
+
+async function saveProfile() {
+  const nickname = profileForm.value.nickname.trim()
+  if (!nickname) { ElMessage.warning('请输入昵称'); return }
+  savingProfile.value = true
+  try {
+    authUser.value = await requestJson<AuthUser>('/api/auth/me', { method: 'PATCH', body: JSON.stringify({ nickname }) })
+    ElMessage.success('昵称已保存')
+  } catch (error) { ElMessage.error(error instanceof Error ? error.message : '保存失败') }
+  finally { savingProfile.value = false }
+}
+
+async function changePassword() {
+  const { currentPassword, newPassword, confirmPassword } = passwordForm.value
+  if (!currentPassword || !newPassword || !confirmPassword) { ElMessage.warning('请完整填写密码信息'); return }
+  if (newPassword.length < 8) { ElMessage.warning('新密码至少需要 8 个字符'); return }
+  if (newPassword !== confirmPassword) { ElMessage.warning('两次输入的新密码不一致'); return }
+  changingPassword.value = true
+  try {
+    await requestJson<void>('/api/auth/password', { method: 'PUT', body: JSON.stringify({ currentPassword, newPassword }) })
+    logout()
+    loginForm.value.password = ''
+    ElMessage.success('密码修改成功，请重新登录')
+  } catch (error) { ElMessage.error(error instanceof Error ? error.message : '密码修改失败') }
+  finally { changingPassword.value = false }
+}
+
+async function revokeAllSessions() {
+  try { await ElMessageBox.confirm('这会让当前设备和其他设备的登录全部失效，是否继续？', '退出所有设备', { confirmButtonText: '确认退出', cancelButtonText: '取消', type: 'warning' }) }
+  catch { return }
+  revokingSessions.value = true
+  try {
+    await requestJson<void>('/api/auth/sessions/revoke', { method: 'POST' })
+    logout()
+    ElMessage.success('所有设备已退出，请重新登录')
+  } catch (error) { ElMessage.error(error instanceof Error ? error.message : '操作失败') }
+  finally { revokingSessions.value = false }
+}
+
 function toChapterView(chapter: ChapterDto): ChapterView {
   return {
     id: chapter.id,
@@ -1132,15 +1324,7 @@ async function initializeWorkspace() {
   loadingWorkspace.value = true
   saveState.value = '正在加载…'
   try {
-    let loadedNovels = await requestJson<NovelDto[]>('/api/novels')
-    if (loadedNovels.length === 0) {
-      const createdNovel = await requestJson<NovelDto>('/api/novels', {
-        method: 'POST',
-        body: JSON.stringify({ title: '雾港来信', description: '在海雾与旧信之间寻找失踪的真相。' }),
-      })
-      loadedNovels = [createdNovel]
-    }
-    novels.value = loadedNovels
+    novels.value = await requestJson<NovelDto[]>('/api/novels')
     saveState.value = '已保存'
   } catch (error) {
     saveState.value = '加载失败'
@@ -3492,7 +3676,8 @@ function handleVisibilityChange() {
 onMounted(async () => {
   window.addEventListener('resize', updateViewportWidth)
   document.addEventListener('visibilitychange', handleVisibilityChange)
-  await initializeWorkspace()
+  await restoreAuth()
+  if (authUser.value) await initializeWorkspace()
   resizeEditor()
 })
 onUnmounted(() => {

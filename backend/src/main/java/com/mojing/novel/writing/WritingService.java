@@ -1,9 +1,9 @@
 package com.mojing.novel.writing;
 
 import com.mojing.novel.qdrant.QdrantMemoryService;
+import com.mojing.novel.style.CurrentUserProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,17 +23,20 @@ public class WritingService {
     private final NovelRepository novelRepository;
     private final ChapterRepository chapterRepository;
     private final QdrantMemoryService qdrantMemoryService;
+    private final CurrentUserProvider currentUserProvider;
 
     public WritingService(NovelRepository novelRepository, ChapterRepository chapterRepository,
-                          QdrantMemoryService qdrantMemoryService) {
+                          QdrantMemoryService qdrantMemoryService,
+                          CurrentUserProvider currentUserProvider) {
         this.novelRepository = novelRepository;
         this.chapterRepository = chapterRepository;
         this.qdrantMemoryService = qdrantMemoryService;
+        this.currentUserProvider = currentUserProvider;
     }
 
     @Transactional(readOnly = true)
     public List<NovelResponse> listNovels() {
-        return novelRepository.findAll(Sort.by(Sort.Direction.DESC, "updatedAt"))
+        return novelRepository.findByOwnerUserIdOrderByUpdatedAtDesc(currentUserProvider.currentUserId())
                 .stream().map(this::toNovelResponse).toList();
     }
 
@@ -45,6 +48,7 @@ public class WritingService {
     @Transactional
     public NovelResponse createNovel(CreateNovelRequest request) {
         NovelEntity novel = new NovelEntity();
+        novel.setOwnerUserId(currentUserProvider.currentUserId());
         novel.setTitle(request.title().trim());
         novel.setDescription(normalizeNullable(request.description()));
         novel.setOutline(normalizeNullable(request.outline()));
@@ -128,13 +132,15 @@ public class WritingService {
     }
 
     private NovelEntity requireNovel(long novelId) {
-        return novelRepository.findById(novelId)
-                .orElseThrow(() -> new WritingNotFoundException("小说不存在：" + novelId));
+        return novelRepository.findByIdAndOwnerUserId(novelId, currentUserProvider.currentUserId())
+                .orElseThrow(() -> new WritingNotFoundException("小说不存在或无权访问"));
     }
 
     private ChapterEntity requireChapter(long chapterId) {
-        return chapterRepository.findById(chapterId)
-                .orElseThrow(() -> new WritingNotFoundException("章节不存在：" + chapterId));
+        ChapterEntity chapter = chapterRepository.findById(chapterId)
+                .orElseThrow(() -> new WritingNotFoundException("章节不存在或无权访问"));
+        requireNovel(chapter.getNovelId());
+        return chapter;
     }
 
     private void refreshNovelWords(NovelEntity novel) {

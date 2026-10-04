@@ -1,4 +1,4 @@
-# Copy this file to application-local.yml for local development.
+# Copy this file to backend/config/application-local.yml for local development.
 # Never commit real passwords or API keys.
 spring:
   datasource:
@@ -15,6 +15,15 @@ spring:
           time_zone: Asia/Shanghai
 
 mojing:
+  migration:
+    # 仅旧数据库首次迁移时设置一次，完成后立即移除。
+    legacy-owner-id: ${LEGACY_NOVEL_OWNER_ID:0}
+  security:
+    jwt-secret: ${JWT_SECRET:replace-with-at-least-32-random-characters}
+    login-max-attempts: ${LOGIN_MAX_ATTEMPTS:5}
+    login-attempt-window: ${LOGIN_ATTEMPT_WINDOW:10m}
+    login-block-duration: ${LOGIN_BLOCK_DURATION:15m}
+    jwt-ttl: ${JWT_TTL:12h}
   ai:
     api-key: ${AI_API_KEY:}
     base-url: ${AI_BASE_URL:https://api.deepseek.com}

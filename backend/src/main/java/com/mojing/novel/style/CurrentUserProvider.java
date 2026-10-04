@@ -1,16 +1,16 @@
 package com.mojing.novel.style;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-/** 接入 Spring Security 后，只需把这里替换为从 Authentication 读取用户ID。 */
 @Component
 public class CurrentUserProvider {
-    private final long localUserId;
-
-    public CurrentUserProvider(@Value("${mojing.security.local-user-id:1}") long localUserId) {
-        this.localUserId = localUserId;
+    public long currentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated())
+            throw new IllegalStateException("当前请求尚未登录");
+        try { return Long.parseLong(authentication.getName()); }
+        catch (NumberFormatException error) { throw new IllegalStateException("登录身份无效"); }
     }
-
-    public long currentUserId() { return localUserId; }
 }

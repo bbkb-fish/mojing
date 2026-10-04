@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import org.hibernate.annotations.CreationTimestamp;
@@ -13,7 +14,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "novel")
+@Table(name = "novel", indexes = @Index(name = "idx_novel_owner_updated", columnList = "owner_user_id,updated_at"))
 class NovelEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,6 +22,9 @@ class NovelEntity {
 
     @Column(nullable = false, length = 200)
     private String title;
+
+    @Column(name = "owner_user_id", nullable = false)
+    private Long ownerUserId;
 
     @Column(length = 1000)
     private String description;
@@ -50,6 +54,8 @@ class NovelEntity {
     private LocalDateTime updatedAt;
 
     Long getId() { return id; }
+    Long getOwnerUserId() { return ownerUserId; }
+    void setOwnerUserId(Long ownerUserId) { this.ownerUserId = ownerUserId; }
     String getTitle() { return title; }
     void setTitle(String title) { this.title = title; }
     String getDescription() { return description; }

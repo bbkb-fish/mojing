@@ -11,40 +11,42 @@ public class NovelProjectController {
     private final NovelProjectService projectService;
     private final NovelAgentService agentService;
     private final NovelProjectChatService chatService;
+    private final NovelAccessService novelAccessService;
 
     public NovelProjectController(NovelProjectService projectService, NovelAgentService agentService,
-                                  NovelProjectChatService chatService) {
+                                  NovelProjectChatService chatService, NovelAccessService novelAccessService) {
         this.projectService = projectService;
         this.agentService = agentService;
         this.chatService = chatService;
+        this.novelAccessService = novelAccessService;
     }
 
     @GetMapping
-    public NovelProjectResponse get(@PathVariable long novelId) { return projectService.get(novelId); }
+    public NovelProjectResponse get(@PathVariable long novelId) { novelAccessService.requireNovel(novelId); return projectService.get(novelId); }
 
     @PutMapping
     public NovelProjectResponse save(@PathVariable long novelId,
                                      @Valid @RequestBody NovelProjectSaveRequest request) {
-        return projectService.save(novelId, request);
+        novelAccessService.requireNovel(novelId); return projectService.save(novelId, request);
     }
 
     @PostMapping("/generate")
     public NovelProjectGenerateResponse generate(@PathVariable long novelId,
                                                  @Valid @RequestBody NovelProjectGenerateRequest request) {
-        return agentService.generateNovelProject(novelId, request);
+        novelAccessService.requireNovel(novelId); return agentService.generateNovelProject(novelId, request);
     }
 
     @GetMapping("/chat")
-    public NovelProjectChatConversationResponse chat(@PathVariable long novelId) { return chatService.conversation(novelId); }
+    public NovelProjectChatConversationResponse chat(@PathVariable long novelId) { novelAccessService.requireNovel(novelId); return chatService.conversation(novelId); }
 
     @PostMapping("/chat/messages")
     public NovelProjectChatConversationResponse chat(@PathVariable long novelId,
                                                       @Valid @RequestBody NovelProjectChatRequest request) {
-        return chatService.chat(novelId, request);
+        novelAccessService.requireNovel(novelId); return chatService.chat(novelId, request);
     }
 
     @PostMapping("/chat/messages/{messageId}/apply")
     public NovelProjectChatApplyResponse apply(@PathVariable long novelId, @PathVariable long messageId) {
-        return chatService.apply(novelId, messageId);
+        novelAccessService.requireNovel(novelId); return chatService.apply(novelId, messageId);
     }
 }

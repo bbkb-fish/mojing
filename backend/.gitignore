@@ -3,3 +3,4 @@ target/
 *.iml
 .env
 src/main/resources/application-local.yml
+config/application-local.yml

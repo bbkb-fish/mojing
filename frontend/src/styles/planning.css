@@ -320,3 +320,54 @@
   .project-chat-quick { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .project-setting-tabs button { font-size: 11px; }
 }
+.auth-loading, .login-shell { min-height: 100dvh; display: grid; place-items: center; background: radial-gradient(circle at 20% 15%, #f0e9f6 0, transparent 32%), linear-gradient(145deg, #faf8f3, #f4eff6); }
+.auth-loading { align-content: center; gap: 12px; color: #887b8e; font-size: 12px; }
+.auth-loading p { margin: 0; }
+.login-card { width: min(420px, calc(100vw - 32px)); box-sizing: border-box; padding: 38px; border: 1px solid #e1d8e5; border-radius: 20px; background: rgba(255,254,251,.94); box-shadow: 0 25px 70px rgba(63,43,73,.12); }
+.login-brand { display: flex; align-items: center; gap: 10px; }
+.login-brand > div { display: flex; flex-direction: column; }
+.login-brand strong { color: #45384c; font-size: 16px; }
+.login-brand small { color: #9a8e9e; font-size: 9px; letter-spacing: .08em; }
+.login-heading { margin: 42px 0 26px; }
+.login-heading > span { color: #9679a8; font-size: 9px; letter-spacing: .18em; }
+.login-heading h1 { margin: 7px 0 8px; color: #3f3445; font-family: serif; font-size: 30px; font-weight: 600; }
+.login-heading p { margin: 0; color: #988c9c; font-size: 11px; }
+.login-card form { display: flex; flex-direction: column; gap: 16px; }
+.login-card form label { display: flex; flex-direction: column; gap: 7px; color: #746779; font-size: 11px; }
+.login-card form input { height: 44px; box-sizing: border-box; border: 1px solid #dfd5e4; border-radius: 10px; padding: 0 13px; background: #fff; color: #453d49; outline: none; }
+.login-card form input:focus { border-color: #a989bc; box-shadow: 0 0 0 3px #88649e10; }
+.login-card form > button { height: 46px; margin-top: 6px; border: 0; border-radius: 10px; background: #765595; color: white; cursor: pointer; font-weight: 600; }
+.login-card form button:disabled { opacity: .65; cursor: wait; }
+.password-input { position: relative; }
+.password-input input { width: 100%; padding-right: 58px !important; }
+.password-input button { position: absolute; top: 50%; right: 10px; transform: translateY(-50%); border: 0; background: transparent; color: #826b90; font-size: 11px; cursor: pointer; }
+.login-options { display: flex; margin-top: -5px; }
+.login-options label { flex-direction: row !important; align-items: center; gap: 7px !important; cursor: pointer; }
+.login-options input { width: 14px; height: 14px !important; accent-color: #765595; }
+.login-error { margin: -5px 0 0; padding: 9px 11px; border-radius: 8px; background: #fbebed; color: #a14858; font-size: 11px; line-height: 1.5; }
+.login-hint { display: block; margin-top: 20px; color: #aaa0ad; font-size: 9px; line-height: 1.7; text-align: center; }
+.auth-switch { display: flex; justify-content: center; align-items: center; gap: 5px; margin-top: 20px; color: #928698; font-size: 11px; }
+.auth-switch button { border: 0; padding: 3px 5px; background: none; color: #765595; font: inherit; font-weight: 600; cursor: pointer; }
+.auth-switch button:hover { text-decoration: underline; }
+.home-empty { display: flex; flex-direction: column; align-items: center; padding: 72px 24px; border: 1px dashed #d9cadd; border-radius: 16px; background: #fffdfb; text-align: center; }
+.home-empty > span { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 14px; background: #efe6f5; color: #8064a6; font-size: 24px; }
+.home-empty h2 { margin: 18px 0 6px; color: #4f4256; font-size: 19px; }
+.home-empty p { margin: 0 0 22px; color: #95899a; font-size: 12px; }
+.home-empty button { padding: 11px 18px; border: 0; border-radius: 9px; background: #765595; color: white; cursor: pointer; }
+.account-menu-user { display: flex; min-width: 150px; flex-direction: column; padding-block: 3px; }
+.account-menu-user strong { color: #55485b; font-size: 12px; }
+.account-menu-user small { color: #a093a4; font-size: 10px; }
+.account-settings { display: grid; gap: 24px; }
+.account-settings section { display: flex; flex-direction: column; gap: 13px; padding: 18px; border: 1px solid #e7dfe9; border-radius: 12px; background: #fdfbfc; }
+.account-settings section > div strong { color: #514458; font-size: 14px; }
+.account-settings section > div p { margin: 4px 0 0; color: #9a8d9e; font-size: 10px; line-height: 1.6; }
+.account-settings label { display: flex; flex-direction: column; gap: 6px; color: #77697d; font-size: 11px; }
+.account-settings input { height: 40px; box-sizing: border-box; border: 1px solid #dfd6e3; border-radius: 8px; padding: 0 11px; background: white; color: #4c4350; outline: none; }
+.account-settings input:focus { border-color: #aa8cba; }
+.account-settings input:disabled { background: #f3f0f3; color: #9b919e; }
+.account-settings section > button { align-self: flex-end; height: 36px; border: 0; border-radius: 8px; padding: 0 15px; background: #765595; color: white; cursor: pointer; }
+.account-settings section > .password-change-button { background: #66506f; }
+.account-settings .account-security-section { background: #fbf7f7; border-color: #eadede; }
+.account-settings section > .revoke-sessions-button { background: transparent; color: #9b4c59; border: 1px solid #dcbfc4; }
+.account-settings section > button:disabled { opacity: .6; cursor: wait; }
+@media (max-width: 520px) { .login-card { padding: 28px 22px; }.login-heading { margin-top: 34px; } }

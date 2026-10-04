@@ -1,6 +1,10 @@
 package com.mojing.novel.common;
 
 import com.mojing.novel.completion.AiProviderException;
+import com.mojing.novel.auth.AuthFailureException;
+import com.mojing.novel.auth.AuthRequestException;
+import com.mojing.novel.auth.AuthRateLimitException;
+import com.mojing.novel.auth.AuthConflictException;
 import com.mojing.novel.qdrant.VectorStoreException;
 import com.mojing.novel.writing.WritingConflictException;
 import com.mojing.novel.writing.WritingNotFoundException;
@@ -13,6 +17,30 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(AuthFailureException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ApiError handleAuthFailure(AuthFailureException exception) {
+        return new ApiError(exception.getMessage());
+    }
+
+    @ExceptionHandler(AuthRequestException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleAuthRequest(AuthRequestException exception) {
+        return new ApiError(exception.getMessage());
+    }
+
+    @ExceptionHandler(AuthConflictException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handleAuthConflict(AuthConflictException exception) {
+        return new ApiError(exception.getMessage());
+    }
+
+    @ExceptionHandler(AuthRateLimitException.class)
+    @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
+    public ApiError handleAuthRateLimit(AuthRateLimitException exception) {
+        return new ApiError(exception.getMessage());
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)

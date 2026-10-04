@@ -1,7 +1,21 @@
 create schema bbkb_novel;
 
+CREATE TABLE app_user (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(50) NOT NULL,
+    password_hash VARCHAR(100) NOT NULL,
+    nickname VARCHAR(100) NOT NULL,
+    avatar_url VARCHAR(500),
+    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+    last_login_at DATETIME,
+    token_version BIGINT NOT NULL DEFAULT 0,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
+    CONSTRAINT uk_app_user_username UNIQUE (username)
+);
 CREATE TABLE novel (
    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+   owner_user_id BIGINT NOT NULL,
    title VARCHAR(200) NOT NULL,
    description VARCHAR(1000),
    outline LONGTEXT,
@@ -10,7 +24,9 @@ CREATE TABLE novel (
    total_words INT NOT NULL DEFAULT 0,
    version BIGINT NOT NULL DEFAULT 0,
    created_at DATETIME NOT NULL,
-   updated_at DATETIME NOT NULL
+   updated_at DATETIME NOT NULL,
+   INDEX idx_novel_owner_updated (owner_user_id, updated_at),
+   CONSTRAINT fk_novel_owner FOREIGN KEY (owner_user_id) REFERENCES app_user(id)
  );
 CREATE TABLE novel_project_profile (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -481,195 +497,3 @@ CREATE TABLE character_identity (
                                     CONSTRAINT uk_character_identity_name UNIQUE (novel_id, identity_name),
                                     INDEX idx_character_identity_canonical (canonical_character_id, reveal_chapter_no)
 );
-
-CREATE TABLE story_volume (
-                              id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                              novel_id BIGINT NOT NULL,
-                              volume_no INT NOT NULL,
-                              title VARCHAR(200) NOT NULL,
-                              chapter_start INT NOT NULL,
-                              chapter_end INT,
-                              objective TEXT,
-                              retrospective LONGTEXT,
-                              chapter_facts_json LONGTEXT,
-                              future_plan LONGTEXT,
-                              key_turning_points TEXT,
-                              climax TEXT,
-                              ending_hook TEXT,
-                              foreshadows TEXT,
-                              locked_beats TEXT,
-                              analyzed_through_chapter_no INT,
-                              source_content_version_sum BIGINT,
-                              status VARCHAR(20) NOT NULL DEFAULT 'GENERATED',
-                              version BIGINT NOT NULL DEFAULT 0,
-                              created_at DATETIME NOT NULL,
-                              updated_at DATETIME NOT NULL,
-                              CONSTRAINT fk_story_volume_novel FOREIGN KEY (novel_id) REFERENCES novel(id) ON DELETE CASCADE,
-                              CONSTRAINT uk_story_volume_no UNIQUE (novel_id, volume_no),
-                              INDEX idx_story_volume_novel_range (novel_id, chapter_start, chapter_end)
-);
-
-CREATE TABLE story_bible_chat_session (
-                                          id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                                          novel_id BIGINT NOT NULL,
-                                          version BIGINT NOT NULL DEFAULT 0,
-                                          created_at DATETIME NOT NULL,
-                                          updated_at DATETIME NOT NULL,
-                                          CONSTRAINT fk_story_bible_chat_novel FOREIGN KEY (novel_id) REFERENCES novel(id) ON DELETE CASCADE,
-                                          CONSTRAINT uk_story_bible_chat_novel UNIQUE (novel_id)
-);
-
-CREATE TABLE story_bible_chat_message (
-                                          id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                                          session_id BIGINT NOT NULL,
-                                          role VARCHAR(20) NOT NULL,
-                                          content TEXT NOT NULL,
-                                          suggestions_json LONGTEXT,
-                                          applied_indexes_json TEXT,
-                                          recalled_message_ids_json TEXT,
-                                          created_at DATETIME NOT NULL,
-                                          CONSTRAINT fk_story_bible_chat_message_session FOREIGN KEY (session_id) REFERENCES story_bible_chat_session(id) ON DELETE CASCADE,
-                                          INDEX idx_story_bible_chat_message_session (session_id, id)
-);
-
-CREATE TABLE story_bible_message_reference (
-                                               id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                                               message_id BIGINT NOT NULL,
-                                               entity_type VARCHAR(30) NOT NULL,
-                                               entity_id BIGINT NOT NULL,
-                                               reference_type VARCHAR(20) NOT NULL,
-                                               CONSTRAINT fk_story_bible_reference_message FOREIGN KEY (message_id) REFERENCES story_bible_chat_message(id) ON DELETE CASCADE,
-                                               CONSTRAINT uk_story_bible_message_reference UNIQUE (message_id, entity_type, entity_id),
-                                               INDEX idx_story_bible_reference_entity (entity_type, entity_id, message_id)
-);
-
-ALTER TABLE story_volume
-    ADD COLUMN chapter_facts_json LONGTEXT NULL AFTER retrospective;
-
-
-CREATE TABLE story_volume (
-                              id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                              novel_id BIGINT NOT NULL,
-                              volume_no INT NOT NULL,
-                              title VARCHAR(200) NOT NULL,
-                              chapter_start INT NOT NULL,
-                              chapter_end INT,
-                              objective TEXT,
-                              retrospective LONGTEXT,
-                              chapter_facts_json LONGTEXT,
-                              future_plan LONGTEXT,
-                              key_turning_points TEXT,
-                              climax TEXT,
-                              ending_hook TEXT,
-                              foreshadows TEXT,
-                              locked_beats TEXT,
-                              analyzed_through_chapter_no INT,
-                              source_content_version_sum BIGINT,
-                              status VARCHAR(20) NOT NULL DEFAULT 'GENERATED',
-                              version BIGINT NOT NULL DEFAULT 0,
-                              created_at DATETIME NOT NULL,
-                              updated_at DATETIME NOT NULL,
-                              CONSTRAINT fk_story_volume_novel FOREIGN KEY (novel_id) REFERENCES novel(id) ON DELETE CASCADE,
-                              CONSTRAINT uk_story_volume_no UNIQUE (novel_id, volume_no),
-                              INDEX idx_story_volume_novel_range (novel_id, chapter_start, chapter_end)
-);
-
-ALTER TABLE story_bible_chat_message
-    ADD COLUMN recalled_message_ids_json TEXT NULL AFTER applied_indexes_json;
-
-CREATE TABLE story_bible_message_reference (
-                                               id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                                               message_id BIGINT NOT NULL,
-                                               entity_type VARCHAR(30) NOT NULL,
-                                               entity_id BIGINT NOT NULL,
-                                               reference_type VARCHAR(20) NOT NULL,
-                                               CONSTRAINT fk_story_bible_reference_message FOREIGN KEY (message_id) REFERENCES story_bible_chat_message(id) ON DELETE CASCADE,
-                                               CONSTRAINT uk_story_bible_message_reference UNIQUE (message_id, entity_type, entity_id),
-                                               INDEX idx_story_bible_reference_entity (entity_type, entity_id, message_id)
-);
-
-CREATE TABLE story_bible_chat_session (
-                                          id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                                          novel_id BIGINT NOT NULL,
-                                          version BIGINT NOT NULL DEFAULT 0,
-                                          created_at DATETIME NOT NULL,
-                                          updated_at DATETIME NOT NULL,
-                                          CONSTRAINT fk_story_bible_chat_novel FOREIGN KEY (novel_id) REFERENCES novel(id) ON DELETE CASCADE,
-                                          CONSTRAINT uk_story_bible_chat_novel UNIQUE (novel_id)
-);
-
-CREATE TABLE story_bible_chat_message (
-                                          id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                                          session_id BIGINT NOT NULL,
-                                          role VARCHAR(20) NOT NULL,
-                                          content TEXT NOT NULL,
-                                          suggestions_json LONGTEXT,
-                                          applied_indexes_json TEXT,
-                                          recalled_message_ids_json TEXT,
-                                          created_at DATETIME NOT NULL,
-                                          CONSTRAINT fk_story_bible_chat_message_session FOREIGN KEY (session_id) REFERENCES story_bible_chat_session(id) ON DELETE CASCADE,
-                                          INDEX idx_story_bible_chat_message_session (session_id, id)
-);
-
-CREATE TABLE story_bible_message_reference (
-                                               id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                                               message_id BIGINT NOT NULL,
-                                               entity_type VARCHAR(30) NOT NULL,
-                                               entity_id BIGINT NOT NULL,
-                                               reference_type VARCHAR(20) NOT NULL,
-                                               CONSTRAINT fk_story_bible_reference_message FOREIGN KEY (message_id) REFERENCES story_bible_chat_message(id) ON DELETE CASCADE,
-                                               CONSTRAINT uk_story_bible_message_reference UNIQUE (message_id, entity_type, entity_id),
-                                               INDEX idx_story_bible_reference_entity (entity_type, entity_id, message_id)
-);
-
-CREATE TABLE novel_project_profile (
-                                       id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                                       novel_id BIGINT NOT NULL,
-                                       inspiration TEXT,
-                                       genre VARCHAR(100),
-                                       channel VARCHAR(100),
-                                       target_audience VARCHAR(500),
-                                       platform VARCHAR(100),
-                                       core_selling_point TEXT,
-                                       protagonist_hook TEXT,
-                                       growth_route TEXT,
-                                       reader_expectations TEXT,
-                                       opening_three_chapters TEXT,
-                                       expected_words INT,
-                                       expected_volumes INT,
-                                       chapter_word_target INT,
-                                       version BIGINT NOT NULL DEFAULT 0,
-                                       created_at DATETIME NOT NULL,
-                                       updated_at DATETIME NOT NULL,
-                                       CONSTRAINT fk_novel_project_profile_novel FOREIGN KEY (novel_id) REFERENCES novel(id) ON DELETE CASCADE,
-                                       CONSTRAINT uk_novel_project_profile_novel UNIQUE (novel_id)
-);
-
-CREATE TABLE novel_project_chat_session (
-                                            id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                                            novel_id BIGINT NOT NULL,
-                                            created_at DATETIME NOT NULL,
-                                            updated_at DATETIME NOT NULL,
-                                            CONSTRAINT fk_novel_project_chat_session_novel FOREIGN KEY (novel_id) REFERENCES novel(id) ON DELETE CASCADE,
-                                            CONSTRAINT uk_novel_project_chat_session_novel UNIQUE (novel_id)
-);
-
-CREATE TABLE novel_project_chat_message (
-                                            id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                                            session_id BIGINT NOT NULL,
-                                            role VARCHAR(20) NOT NULL,
-                                            content LONGTEXT NOT NULL,
-                                            suggestion_json LONGTEXT,
-                                            source_novel_version BIGINT,
-                                            source_profile_version BIGINT,
-                                            analyzed_through_chapter_no INT,
-                                            source_content_version_sum BIGINT,
-                                            applied BOOLEAN NOT NULL DEFAULT FALSE,
-                                            created_at DATETIME NOT NULL,
-                                            CONSTRAINT fk_novel_project_chat_message_session FOREIGN KEY (session_id) REFERENCES novel_project_chat_session(id) ON DELETE CASCADE,
-                                            INDEX idx_novel_project_chat_message_session (session_id, id)
-);
-
-ALTER TABLE novel_project_chat_session
-    ADD COLUMN memory_json LONGTEXT NULL AFTER novel_id,
-    ADD COLUMN memory_updated_through_message_id BIGINT NULL AFTER memory_json;
