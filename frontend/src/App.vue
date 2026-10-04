@@ -393,7 +393,7 @@
     </header>
     <main class="project-page-main">
       <section class="project-hero">
-        <div><span>NOVEL FOUNDATION</span><h1>先把这本书想清楚</h1><p>手工修改会自动保存；AI 会通过多轮讨论给出完整方案，只有你点击应用后才会修改正式资料。</p><small :class="['project-save-state', projectSaveState]">{{ projectSaveLabel }}</small></div>
+        <div><span>NOVEL FOUNDATION</span><h1>先定一个能写的方向</h1><p>一句灵感就能开始，细节边写边补。手工修改自动保存，AI 草案由你确认后应用。</p><small :class="['project-save-state', projectSaveState]">{{ projectSaveLabel }}</small></div>
         <div class="project-status"><strong>{{ projectWrittenThrough ? `已写至第 ${projectWrittenThrough} 章` : '尚无正文' }}</strong><span>{{ projectWrittenThrough ? '可在立项顾问中开启“补建立项”' : '适合从一句灵感开始' }}</span></div>
       </section>
       <div v-if="loadingProject" class="story-library-loading"><el-icon class="is-loading"><Loading /></el-icon><span>正在读取立项资料…</span></div>
@@ -440,7 +440,7 @@
         <footer class="project-save-bar"><div><strong>{{ projectAiDraftPending ? 'AI 草案等待确认' : '手工修改自动保存' }}</strong><span>{{ projectAiDraftPending ? '检查生成结果；继续手工修改也视为确认，并会自动保存。' : '停止输入约一秒后保存，离开页面前也会提交待保存内容。' }}</span></div><el-button type="primary" size="large" :loading="savingProject" @click="saveProject">{{ projectAiDraftPending ? '确认并保存 AI 草案' : '立即保存' }}</el-button></footer>
         </div>
         <aside class="project-chat">
-          <header><div><span>✦</span><div><strong>立项顾问</strong><small>持久多轮讨论 · 先看方案再应用</small></div></div></header>
+          <header><div><span>✦</span><div><strong>立项顾问</strong><small>先给方向 · 细节慢慢补</small></div></div></header>
           <section v-if="projectWrittenThrough" class="project-chat-source">
             <div><strong>补建立项模式</strong><small>当前已写至第 {{ projectWrittenThrough }} 章</small></div>
             <label><input v-model="projectImportWrittenStory" type="checkbox" /><span>本轮导入已写正文</span></label>
@@ -449,7 +449,7 @@
           </section>
           <div ref="projectChatMessagesRef" class="project-chat-messages">
             <div v-if="loadingProjectChat" class="project-chat-empty"><el-icon class="is-loading"><Loading /></el-icon><span>正在读取对话…</span></div>
-            <div v-else-if="!projectChatMessages.length" class="project-chat-empty"><span>✦</span><strong>从模糊灵感开始也可以</strong><p>说说你想写的感觉、不想要的套路，或让我先问你几个关键问题。</p></div>
+            <div v-else-if="!projectChatMessages.length" class="project-chat-empty"><span>✦</span><strong>一句灵感就能开始</strong><p>说说你想写的人物或故事，我先给一个可写的方向。没想好的设定可以以后再补。</p></div>
             <article v-for="message in projectChatMessages" :key="message.id" :class="['project-chat-message', { user: message.role === 'USER' }]">
               <strong>{{ message.role === 'USER' ? '你' : '立项顾问' }}</strong>
               <p>{{ message.content }}</p>
@@ -464,7 +464,7 @@
           </div>
           <footer>
             <textarea v-model="projectChatInput" maxlength="5000" placeholder="例如：我想写男频都市异能，节奏快，不要系统流，能力必须有代价…" @keydown.ctrl.enter.prevent="sendProjectChat('DISCUSS')"></textarea>
-            <div class="project-chat-quick"><button @click="sendProjectChat('FOUNDATION')">完善设定</button><button @click="sendProjectChat('DESCRIPTION')">生成简介</button><button @click="sendProjectChat('OUTLINE')">生成总纲</button><button @click="sendProjectChat('ALL')">整理全案</button></div>
+            <div class="project-chat-quick"><button @click="sendProjectChat('FOUNDATION')">整理方向</button><button @click="sendProjectChat('DESCRIPTION')">生成简介</button><button @click="sendProjectChat('OUTLINE')">生成总纲</button><button @click="sendProjectChat('ALL')">生成草案</button></div>
             <div class="project-chat-send"><span>Ctrl + Enter 发送</span><button :disabled="sendingProjectChat || !projectChatInput.trim()" @click="sendProjectChat('DISCUSS')">发送</button></div>
           </footer>
         </aside>
@@ -1473,10 +1473,10 @@ function scrollProjectChatToBottom() {
 }
 
 const projectChatDefaults: Record<Exclude<NovelProjectChatTarget, 'DISCUSS'>, string> = {
-  FOUNDATION: '请基于我们的讨论，完善作品定位、核心卖点、金手指、升级路线和读者期待，并给出可应用的立项方案。',
+  FOUNDATION: '请基于现有讨论，直接整理题材基调、主角特点、核心卖点和主线方向，给出可应用的简明立项草案。未定细节留到大纲和章节阶段再补。',
   DESCRIPTION: '请基于我们的讨论生成或修改小说简介，并给出可应用的立项方案。',
-  OUTLINE: '请基于我们的讨论生成或修改故事总纲，并给出可应用的立项方案。',
-  ALL: '请综合我们的全部讨论，整理一份完整、可连载的立项方案。',
+  OUTLINE: '请基于现有讨论，直接生成或修改故事总纲，只交代起点、主线目标和大致推进方向，具体事件以后再细化，并给出可应用的立项草案。',
+  ALL: '请综合现有讨论，直接整理一份能开始写作的简明立项草案，不需要提前定完全部设定，未定细节保持弹性。',
 }
 
 async function sendProjectChat(target: NovelProjectChatTarget = 'DISCUSS') {
